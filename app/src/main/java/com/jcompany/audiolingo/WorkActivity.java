@@ -23,11 +23,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WorkActivity extends AppCompatActivity {
-    Button button_listen,button_verify,button_correction;
+    Button button_listen, button_verify, button_correction, button_pause;
     TextView textview;
     EditText edittext_response;
     TextToSpeech textToSpeech;
     private int currentPosition = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -43,16 +44,16 @@ public class WorkActivity extends AppCompatActivity {
             textview = findViewById(R.id.textview);
             edittext_response = findViewById(R.id.edittext_response);
             button_verify = findViewById(R.id.button_verify);
+            button_pause = findViewById(R.id.button_pause);
             ArrayList<String> textUserToArray = new ArrayList<String>();
             ArrayList<String> textToArray = new ArrayList<String>();
-            textToSpeech=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                 @Override
                 public void onInit(int status) {
-                    if(status != TextToSpeech.ERROR) {
-                        if ( value_id.equals("1")) {
+                    if (status != TextToSpeech.ERROR) {
+                        if (value_id.equals("1")) {
                             textToSpeech.setLanguage(Locale.UK);
-                        }
-                        else {
+                        } else {
                             textToSpeech.setLanguage(Locale.ITALIAN);
                         }
 
@@ -63,10 +64,10 @@ public class WorkActivity extends AppCompatActivity {
             button_correction.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String userInput  = edittext_response.getText().toString();
+                    String userInput = edittext_response.getText().toString();
                     ArrayList<String> userInputWords = splitIntoWords(userInput);
                     ArrayList<String> expectedWords = splitIntoWords(value);
-                    String texte = verification(userInputWords,expectedWords);
+                    String texte = verification(userInputWords, expectedWords);
                     SpannableString spannableString = new SpannableString(texte);
                     ClickableSpan clickableSpan = new ClickableSpan() {
                         @Override
@@ -86,10 +87,20 @@ public class WorkActivity extends AppCompatActivity {
                     if (textToSpeech.isSpeaking()) {
                         button_listen.setText("Ecouter");
                         textToSpeech.stop();
-                    }
-                    else {
+                    } else {
                         button_listen.setText("Arreter");
                         textToSpeech.speak(value, TextToSpeech.QUEUE_ADD, null);
+                    }
+
+                }
+            });
+            button_pause.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (button_pause.getText() == "Pause") {
+                        button_pause.setText("Reprendre");
+                    } else {
+                        button_pause.setText("Pause");
                     }
 
                 }
@@ -97,16 +108,14 @@ public class WorkActivity extends AppCompatActivity {
             button_verify.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String userInput  = edittext_response.getText().toString();
+                    String userInput = edittext_response.getText().toString();
                     ArrayList<String> userInputWords = splitIntoWords(userInput);
                     ArrayList<String> expectedWords = splitIntoWords(value);
-                    String texte = verificationPendue(userInputWords,expectedWords).toString();
-                    if (userInputWords.equals(expectedWords)){
-                        textview.setText("vous avez raison \n"+texte);
-                    }
-                    else
-                    {
-                        textview.setText("vous avez tort \n"+texte);
+                    String texte = verificationPendue(userInputWords, expectedWords).toString();
+                    if (userInputWords.equals(expectedWords)) {
+                        textview.setText("vous avez raison \n" + texte);
+                    } else {
+                        textview.setText("vous avez tort \n" + texte);
                     }
 
 
@@ -140,12 +149,13 @@ public class WorkActivity extends AppCompatActivity {
         // On renvoie la liste de mots extraits de la phrase.
         return words;
     }
+
     /**
      * Vérifie les mots saisis par l'utilisateur et les compare aux mots attendus.
      * Remplace les espaces par des points entre les mots dans le résultat.
      *
-     * @param userInputWords   Liste des mots saisis par l'utilisateur.
-     * @param expectedWords    Liste des mots attendus.
+     * @param userInputWords Liste des mots saisis par l'utilisateur.
+     * @param expectedWords  Liste des mots attendus.
      * @return Le résultat avec les espaces remplacés par des points entre les mots.
      */
     public static String verificationPendue(ArrayList<String> userInputWords, ArrayList<String> expectedWords) {
@@ -202,8 +212,9 @@ public class WorkActivity extends AppCompatActivity {
             }
         }
         //Collections.shuffle(newlist);
-        return  newlist.toString();
+        return newlist.toString();
     }
+
     @Override
     protected void onPause() {
         super.onPause();
